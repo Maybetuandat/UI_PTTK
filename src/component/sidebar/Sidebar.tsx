@@ -4,6 +4,7 @@ import ModelTrainingIcon from "@mui/icons-material/ModelTraining";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import TopicIcon from "@mui/icons-material/Topic";
+import { mycolor } from "../../theme/color";
 
 export default function Sidebar() {
   return (
@@ -14,6 +15,7 @@ export default function Sidebar() {
       boxShadow={2}
       paddingTop={2}
       alignItems="center"
+      bgcolor={mycolor.blueBackGround}
     >
       <Stack alignItems="center" spacing={1}>
         <IconButton component={Link} to="/tools">

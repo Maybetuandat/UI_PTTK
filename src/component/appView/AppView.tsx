@@ -5,6 +5,7 @@ import TopNavbar from "../topnavbar/TopNavbar";
 import { red } from "@mui/material/colors";
 
 import AppRoutes from "../routes/AppRoute";
+import { mycolor } from "../../theme/color";
 
 export default function AppView() {
   return (
@@ -14,7 +15,7 @@ export default function AppView() {
         <Box
           position="fixed"
           width="100%"
-          bgcolor="white"
+          bgcolor={mycolor.blueBackGround}
           display="flex"
           zIndex={1000}
           alignItems="center"
@@ -28,7 +29,7 @@ export default function AppView() {
           <Sidebar />
 
           {/* Content Area - Route-based Navigation */}
-          <Box flex={1} p={3} overflow="auto" bgcolor={red[50]}>
+          <Box flex={1} p={3} overflow="auto" bgcolor={"white"}>
             <AppRoutes />
           </Box>
         </Box>
