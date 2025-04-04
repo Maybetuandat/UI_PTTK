@@ -5,6 +5,7 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import TopicIcon from "@mui/icons-material/Topic";
 import { mycolor } from "../../theme/color";
+import StackedBarChartIcon from "@mui/icons-material/StackedBarChart";
 
 export default function Sidebar() {
   return (
@@ -33,9 +34,9 @@ export default function Sidebar() {
 
       <Stack alignItems="center" spacing={1}>
         <IconButton component={Link} to="/launch">
-          <RocketLaunchIcon />
+          <StackedBarChartIcon />
         </IconButton>
-        <Typography variant="caption">Launch</Typography>
+        <Typography variant="caption">Statistics</Typography>
       </Stack>
 
       <Stack alignItems="center" spacing={1}>

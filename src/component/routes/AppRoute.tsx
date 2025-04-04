@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import ToolsScreen from "../screen/toolscreen/ToolScreen";
 import TrainingScreen from "../screen/trainingscreen/TrainingScreen";
-import LaunchScreen from "../screen/launchscreen/LaunchScreen";
+import StatisticScreen from "../screen/statisticscreen/StatisticScreen";
 import ManageScreen from "../screen/managescreen/ManageScreen";
 import FraudTemplateScreen from "../screen/managescreen/FraudTemplate/FraudTemplateScreen";
 import FraudTemplateAddScreen from "../screen/managescreen/FraudTemplate/AddFraudTemplate/FraudTemplateAddScreen";
@@ -12,7 +12,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/tools" element={<ToolsScreen />} />
       <Route path="/training" element={<TrainingScreen />} />
-      <Route path="/launch" element={<LaunchScreen />} />
+      <Route path="/launch" element={<StatisticScreen />} />
       <Route path="/manage" element={<ManageScreen />} />
 
       <Route

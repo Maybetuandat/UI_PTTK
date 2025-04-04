@@ -34,22 +34,27 @@ export default function FraudImageGrid() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   console.log("fraudLabelId", fraudLabelId);
+
+  const fetchFraudLabel = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/fraud-label/${fraudLabelId}`
+      );
+      setFraudLabel(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy nhãn gian lận:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchTemplates = async () => {
       if (!fraudLabelId) return;
 
       try {
-        const [templatesResponse, labelResponse] = await Promise.all([
-          axios.get(`${API_URL}/fraud-template/by-label/${fraudLabelId}`),
-          axios.get(`${API_URL}/fraud-label/${fraudLabelId}`),
-        ]);
-
-        if (!Array.isArray(templatesResponse.data)) {
-          throw new Error("Dữ liệu trả về không hợp lệ");
-        }
-
+        const templatesResponse = await axios.get(
+          `${API_URL}/fraud-template/by-label/${fraudLabelId}`
+        );
         setTemplates(templatesResponse.data);
-        setFraudLabel(labelResponse.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
         setError("Không thể tải dữ liệu. Vui lòng thử lại.");
@@ -61,6 +66,9 @@ export default function FraudImageGrid() {
     fetchTemplates();
   }, [fraudLabelId]);
 
+  useEffect(() => {
+    fetchFraudLabel();
+  }, [fraudLabelId]);
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
 
