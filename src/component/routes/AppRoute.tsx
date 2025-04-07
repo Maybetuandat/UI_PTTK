@@ -6,6 +6,7 @@ import ManageScreen from "../screen/managescreen/ManageScreen";
 import FraudTemplateScreen from "../screen/managescreen/FraudTemplate/FraudTemplateScreen";
 import FraudTemplateAddScreen from "../screen/managescreen/FraudTemplate/AddFraudTemplate/FraudTemplateAddScreen";
 import DetailFraudTemplateScreen from "../screen/managescreen/FraudTemplate/DetailFraudTemplate/DetailFraudTemplateScreen";
+import ModelScreen from "../screen/modelscreen/ModelScreen";
 
 export default function AppRoutes() {
   return (
@@ -14,7 +15,7 @@ export default function AppRoutes() {
       <Route path="/training" element={<TrainingScreen />} />
       <Route path="/launch" element={<StatisticScreen />} />
       <Route path="/manage" element={<ManageScreen />} />
-
+      <Route path="/model" element={<ModelScreen />} />
       <Route
         path="/manage/fraud-template/by-label/:fraudLabelId"
         element={<FraudTemplateScreen />}
