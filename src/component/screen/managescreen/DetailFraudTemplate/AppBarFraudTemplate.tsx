@@ -4,7 +4,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FraudTemplate } from "../../../../../types/model/FraudTemplate";
+import { FraudTemplate } from "../../../../types/model/FraudTemplate";
 
 export default function AppBarFraudTemplate({
   index,
@@ -49,7 +49,6 @@ export default function AppBarFraudTemplate({
       sx={{
         background: "white",
         color: "black",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between", alignItems: "center" }}>
@@ -60,7 +59,7 @@ export default function AppBarFraudTemplate({
             color="inherit"
             aria-label="back"
             onClick={() => {
-              navigate(`/manage/fraud-template/by-label/${fraudLabelId}`);
+              navigate(`/manage`);
             }}
           >
             <ArrowBackIcon />

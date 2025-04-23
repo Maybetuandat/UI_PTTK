@@ -1,117 +1,115 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Box,
   Typography,
-  Button,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
+  Button,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import axios from "axios";
-import FraudLabelTable from "./FraudLabel/FraudLabelTable";
-import { FraudLabel } from "../../../types/model/FraudLabel";
+import { FraudTemplate } from "../../../types/model/FraudTemplate";
+import Header from "./Header";
+import TemplateGrid from "./TemplateGrid";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function ManageScreen() {
-  const [fraudLabels, setFraudLabels] = useState<FraudLabel[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
+  const [templates, setTemplates] = useState<FraudTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openAdd, setOpenAdd] = useState<boolean>(false);
-  const [newFraud, setNewFraud] = useState({ name: "", description: "" });
-
-  const fetchFraudLabels = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/fraud-label`);
-      setFraudLabels(response.data);
-    } catch (err) {
-      setError("Lỗi khi tải dữ liệu!");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [openBulkDelete, setOpenBulkDelete] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   useEffect(() => {
-    fetchFraudLabels();
+    const fetchTemplates = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/fraud-template`);
+        setTemplates(response.data);
+        //  console.log("Dữ liệu:", response.data);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+        setError("Không thể tải dữ liệu. Vui lòng thử lại.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTemplates();
   }, []);
 
-  const handleAddOpen = () => setOpenAdd(true);
-  const handleAddClose = () => {
-    setOpenAdd(false);
-    setNewFraud({ name: "", description: "" }); // Reset form
-  };
-
-  const handleAddSubmit = async () => {
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
     try {
-      const formData = new FormData();
-      formData.append("name", newFraud.name);
-      formData.append("description", newFraud.description);
-
-      await axios.post(`${API_URL}/fraud-label`, formData);
-      fetchFraudLabels();
-      handleAddClose();
+      await axios.delete(`${API_URL}/fraud-template`, {
+        data: selectedIds,
+        headers: { "Content-Type": "application/json" },
+      });
+      const response = await axios.get(`${API_URL}/fraud-template`);
+      setTemplates(response.data);
+      setSelectedIds([]);
+      setOpenBulkDelete(false);
+      alert("Xóa nhiều mục thành công!");
     } catch (error) {
-      console.error("Lỗi khi thêm mới:", error);
+      console.error("Xóa thất bại:", error);
+      alert("Xóa nhiều thất bại!");
     }
   };
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" mb={2}>
-        📂 Quản lý hành vi gian lận
-      </Typography>
+    <Box sx={{ width: "100%", height: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: "white",
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 3,
+          height: "100%",
+        }}
+      >
+        <Header
+          selectedIds={selectedIds}
+          totalTemplates={templates.length}
+          setSelectedIds={setSelectedIds}
+          openBulkDelete={() => setOpenBulkDelete(true)}
+          templates={templates}
+        />
 
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddOpen}
-        >
-          Thêm hành vi gian lận
-        </Button>
+        {loading ? (
+          <Typography textAlign="center">Đang tải...</Typography>
+        ) : error ? (
+          <Typography textAlign="center" color="red">
+            {error}
+          </Typography>
+        ) : templates.length === 0 ? (
+          <Typography textAlign="center" color="gray">
+            Không tồn tại dữ liệu
+          </Typography>
+        ) : (
+          <TemplateGrid
+            templates={templates}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+          />
+        )}
       </Box>
 
-      {loading ? (
-        <CircularProgress />
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <FraudLabelTable
-          fraudLabels={fraudLabels}
-          fetchFraudLabels={fetchFraudLabels}
-        />
-      )}
-
-      <Dialog open={openAdd} onClose={handleAddClose} maxWidth="sm" fullWidth>
-        <DialogTitle>➕ Thêm hành vi gian lận</DialogTitle>
+      {/* Dialog xác nhận xóa nhiều */}
+      <Dialog open={openBulkDelete} onClose={() => setOpenBulkDelete(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Tên hành vi"
-            fullWidth
-            margin="normal"
-            value={newFraud.name}
-            onChange={(e) => setNewFraud({ ...newFraud, name: e.target.value })}
-          />
-          <TextField
-            label="Mô tả"
-            fullWidth
-            margin="normal"
-            multiline
-            rows={3}
-            value={newFraud.description}
-            onChange={(e) =>
-              setNewFraud({ ...newFraud, description: e.target.value })
-            }
-          />
+          <Typography>
+            Are you sure to delete {selectedIds.length} template ?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleAddClose}>Hủy</Button>
-          <Button variant="contained" onClick={handleAddSubmit} color="primary">
-            Thêm
+          <Button onClick={() => setOpenBulkDelete(false)}>Cancel</Button>
+          <Button color="error" onClick={handleBulkDelete}>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

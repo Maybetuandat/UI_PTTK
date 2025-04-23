@@ -3,6 +3,6 @@ export interface FraudTemplate {
   imageUrl: string;
   name: string;
   createAt: string;
-  width: string;
-  height: string;
+  width: number;
+  height: number;
 }

@@ -1,5 +1,7 @@
 export interface FraudLabel {
   id: number;
   name: string;
-  description: string;
+  classId: number;
+
+  color: string;
 }

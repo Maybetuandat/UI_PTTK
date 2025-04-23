@@ -36,7 +36,6 @@ const UploadPage = () => {
 
     setUploading(true);
     const formData = new FormData();
-    formData.append("fraudLabelId", fraudLabelId || "");
 
     selectedFiles.forEach((file) => {
       formData.append("file", file);
@@ -51,7 +50,7 @@ const UploadPage = () => {
       console.log("Upload thành công:", response.data);
       alert("Upload thành công!");
       setSelectedFiles([]);
-      navigate(`/manage/fraud-template/by-label/${fraudLabelId}`);
+      navigate(`/manage`);
     } catch (error) {
       console.error("Lỗi khi upload:", error);
       alert("Có lỗi xảy ra khi upload.");
@@ -62,19 +61,14 @@ const UploadPage = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" p={4}>
-      {/* Nút Quay lại */}
       <Box width="100%" display="flex" alignItems="center">
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBack fontSize="large" />
         </IconButton>
       </Box>
-
-      {/* Tiêu đề */}
       <Typography variant="h5" fontWeight="bold" mb={2}>
         {fraudLabelName}
       </Typography>
-
-      {/* Khu vực Kéo & Thả */}
       <Box
         {...getRootProps()}
         sx={{
@@ -100,8 +94,6 @@ const UploadPage = () => {
           Hỗ trợ tệp định dạng JPEG, PNG, BMP, TIFF
         </Typography>
       </Box>
-
-      {/* Hiển thị ảnh xem trước */}
       {selectedFiles.length > 0 && (
         <Box
           display="flex"
@@ -126,8 +118,6 @@ const UploadPage = () => {
           ))}
         </Box>
       )}
-
-      {/* Nút xác nhận upload */}
       <Button
         variant="contained"
         color="primary"
