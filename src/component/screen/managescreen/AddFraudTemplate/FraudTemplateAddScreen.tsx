@@ -50,7 +50,7 @@ const UploadPage = () => {
       console.log("Upload thành công:", response.data);
       alert("Upload thành công!");
       setSelectedFiles([]);
-      navigate(`/manage`);
+      navigate(`/manage/fraud-template`);
     } catch (error) {
       console.error("Lỗi khi upload:", error);
       alert("Có lỗi xảy ra khi upload.");

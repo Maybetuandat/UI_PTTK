@@ -59,7 +59,7 @@ export default function AppBarFraudTemplate({
             color="inherit"
             aria-label="back"
             onClick={() => {
-              navigate(`/manage`);
+              navigate(`/manage/fraud-template`);
             }}
           >
             <ArrowBackIcon />

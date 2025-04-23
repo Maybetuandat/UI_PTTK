@@ -168,9 +168,6 @@ export default function BoundingBoxEditor({
         <Typography variant="h6">Bounding Box Editor</Typography>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            DB Boxes: {dbBoxes.length} | New Boxes: {boxes.length}
-          </Typography>
           <Button
             startIcon={<UndoIcon />}
             onClick={handleUndo}

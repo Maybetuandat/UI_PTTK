@@ -7,8 +7,8 @@ import { FraudTemplate } from "../../../../../types/model/FraudTemplate";
 
 interface CanvasProps {
   fraudTemplate: FraudTemplate | undefined;
-  dbBoxes: BoundingBox[]; // Boxes from database that cannot be modified
-  boxes: BoundingBox[]; // New boxes that can be modified
+  dbBoxes: BoundingBox[];
+  boxes: BoundingBox[];
   labels: FraudLabel[];
   selectedLabel: FraudLabel | null;
   onBoxAdd: (box: BoundingBox) => void;
@@ -17,7 +17,7 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({
   fraudTemplate,
-  dbBoxes = [], // Default to empty array
+  dbBoxes = [],
   boxes,
   labels,
   selectedLabel,
@@ -65,7 +65,6 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const handleImageLoad = () => {
     if (fraudTemplate && imageRef.current) {
-      // Set display dimensions based on container size
       calculateDisplayDimensions();
     }
   };
@@ -77,7 +76,6 @@ const Canvas: React.FC<CanvasProps> = ({
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
 
-    // Calculate the maximum size that fits in the container while maintaining aspect ratio
     const imageAspectRatio = fraudTemplate.width / fraudTemplate.height;
 
     let displayWidth, displayHeight;
@@ -92,19 +90,16 @@ const Canvas: React.FC<CanvasProps> = ({
       displayHeight = displayWidth / imageAspectRatio;
     }
 
-    // Update display dimensions
     setDisplayDimensions({
       width: displayWidth,
       height: displayHeight,
     });
 
-    // Calculate scale factors
     setScale({
       x: displayWidth / fraudTemplate.width,
       y: displayHeight / fraudTemplate.height,
     });
 
-    // Use these dimensions to setup the canvas
     setupCanvas(displayWidth, displayHeight);
   };
 
@@ -113,14 +108,12 @@ const Canvas: React.FC<CanvasProps> = ({
 
     const canvas = canvasRef.current;
 
-    // Set canvas size - if width and height are provided, use them, otherwise calculate
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
     } else {
-      // Default sizing logic
       calculateDisplayDimensions();
-      return; // calculateDisplayDimensions will call setupCanvas again with dimensions
+      return;
     }
 
     drawCanvas();
@@ -161,7 +154,7 @@ const Canvas: React.FC<CanvasProps> = ({
         ctx.fillStyle = label.color;
         ctx.font = "12px Arial";
         ctx.fillText(
-          `DB: ${label.name}`,
+          `${label.name}`,
           box.xPixel * scale.x,
           box.yPixel * scale.y - 5
         );
@@ -188,7 +181,7 @@ const Canvas: React.FC<CanvasProps> = ({
         ctx.fillStyle = label.color;
         ctx.font = "12px Arial";
         ctx.fillText(
-          `New: ${label.name}`,
+          `${label.name}`,
           box.xPixel * scale.x,
           box.yPixel * scale.y - 5
         );

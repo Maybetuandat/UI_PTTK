@@ -318,13 +318,7 @@ export default function DetailFraudTemplateScreen() {
                               }}
                             />
                           )}
-                          <Typography
-                            variant="caption"
-                            display="block"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            DB
-                          </Typography>
+
                           <Typography variant="caption" display="block">
                             <strong>Position:</strong> {Math.round(box.xPixel)},{" "}
                             {Math.round(box.yPixel)}
@@ -380,13 +374,7 @@ export default function DetailFraudTemplateScreen() {
                               }}
                             />
                           )}
-                          <Typography
-                            variant="caption"
-                            display="block"
-                            sx={{ fontWeight: "bold", color: "blue" }}
-                          >
-                            NEW
-                          </Typography>
+
                           <Typography variant="caption" display="block">
                             <strong>Position:</strong> {Math.round(box.xPixel)},{" "}
                             {Math.round(box.yPixel)}

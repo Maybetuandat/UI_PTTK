@@ -1,7 +1,6 @@
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import ModelTrainingIcon from "@mui/icons-material/ModelTraining";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import TopicIcon from "@mui/icons-material/Topic";
 import { mycolor } from "../../theme/color";
@@ -40,7 +39,7 @@ export default function Sidebar() {
       </Stack>
 
       <Stack alignItems="center" spacing={1}>
-        <IconButton component={Link} to="/manage">
+        <IconButton component={Link} to="/manage/fraud-template">
           <TopicIcon />
         </IconButton>
         <Typography variant="caption">Manage</Typography>

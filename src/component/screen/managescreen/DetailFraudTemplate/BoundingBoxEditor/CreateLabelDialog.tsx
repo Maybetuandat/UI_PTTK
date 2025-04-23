@@ -92,13 +92,6 @@ const CreateLabelDialog: React.FC<CreateLabelDialogProps> = ({
           variant="outlined"
           margin="dense"
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ display: "block", mb: 2 }}
-        >
-          You cannot edit Class name afterwards
-        </Typography>
 
         <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
           Class Color

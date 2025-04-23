@@ -13,6 +13,8 @@ import {
 import { FraudTemplate } from "../../../types/model/FraudTemplate";
 import Header from "./Header";
 import TemplateGrid from "./TemplateGrid";
+import BoundingBox from "../../../types/model/BoundingBox";
+import { FraudLabel } from "../../../types/model/FraudLabel";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,12 +26,18 @@ export default function ManageScreen() {
   const [openBulkDelete, setOpenBulkDelete] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  const [templateBoxesMap, setTemplateBoxesMap] = useState<
+    Record<number, BoundingBox[]>
+  >({});
+  const [labels, setLabels] = useState<FraudLabel[]>([]);
+  const [loadingBoxes, setLoadingBoxes] = useState(false);
+
+  // Fetch templates
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         const response = await axios.get(`${API_URL}/fraud-template`);
         setTemplates(response.data);
-        //  console.log("Dữ liệu:", response.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
         setError("Không thể tải dữ liệu. Vui lòng thử lại.");
@@ -39,6 +47,59 @@ export default function ManageScreen() {
     };
     fetchTemplates();
   }, []);
+
+  // Fetch all labels once
+  useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/fraud-label`);
+        setLabels(response.data);
+      } catch (error) {
+        console.error("Error fetching labels:", error);
+      }
+    };
+
+    fetchLabels();
+  }, []);
+
+  // Fetch bounding boxes for all templates
+  useEffect(() => {
+    const fetchAllBoundingBoxes = async () => {
+      if (templates.length === 0) return;
+
+      setLoadingBoxes(true);
+      const boxesMap: Record<number, BoundingBox[]> = {};
+
+      try {
+        // Fetch boxes for each template
+        const promises = templates.map(async (template) => {
+          try {
+            const response = await axios.get(`${API_URL}/bounding-box`, {
+              params: {
+                fraudTemplateId: template.id,
+              },
+            });
+            boxesMap[template.id] = response.data;
+          } catch (err) {
+            console.error(
+              `Error fetching boxes for template ${template.id}:`,
+              err
+            );
+            boxesMap[template.id] = [];
+          }
+        });
+
+        await Promise.all(promises);
+        setTemplateBoxesMap(boxesMap);
+      } catch (error) {
+        console.error("Error fetching bounding boxes:", error);
+      } finally {
+        setLoadingBoxes(false);
+      }
+    };
+
+    fetchAllBoundingBoxes();
+  }, [templates]);
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
@@ -94,6 +155,9 @@ export default function ManageScreen() {
             templates={templates}
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
+            templateBoxesMap={templateBoxesMap}
+            labels={labels}
+            loadingBoxes={loadingBoxes}
           />
         )}
       </Box>

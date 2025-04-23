@@ -87,8 +87,7 @@ export default function Header({
                 fontSize: "0.875rem",
               }}
               onClick={() => {
-                // Xử lý khi nhấp vào Manage Class
-                // Thêm logic điều hướng hoặc hành động khác ở đây
+                navigate("/manage/fraud-label");
               }}
             >
               Manage Class
