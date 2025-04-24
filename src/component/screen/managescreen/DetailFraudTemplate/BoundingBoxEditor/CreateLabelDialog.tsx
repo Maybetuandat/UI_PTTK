@@ -51,6 +51,7 @@ const CreateLabelDialog: React.FC<CreateLabelDialogProps> = ({
     { name: "Dark Purple", colorCode: "#673AB7" },
     { name: "Light Blue", colorCode: "#03A9F4" },
     { name: "Yellow", colorCode: "#FFEB3B" },
+    { name: "Black", colorCode: "#000000" },
   ];
 
   const handleSave = () => {

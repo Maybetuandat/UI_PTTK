@@ -29,6 +29,7 @@ interface HeaderProps {
   setSelectedIds: (ids: number[]) => void;
   openBulkDelete: () => void;
   templates: FraudTemplate[];
+  setOpenDialog: (open: boolean) => void;
 }
 
 export default function Header({
@@ -37,6 +38,7 @@ export default function Header({
   setSelectedIds,
   openBulkDelete,
   templates,
+  setOpenDialog,
 }: HeaderProps) {
   const navigate = useNavigate();
   const handleSelectAll = () => {
@@ -70,7 +72,7 @@ export default function Header({
             }}
           />
 
-          <IconButton size="small">
+          <IconButton size="small" onClick={() => setOpenDialog(true)}>
             <EqualizerIcon fontSize="medium" />
           </IconButton>
         </Box>

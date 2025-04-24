@@ -201,6 +201,7 @@ export default function DetailFraudTemplateScreen() {
   // Combine boxes for display in the sidebar
   const allBoxes = [...dbBoxes, ...newBoxes];
 
+  console.log(fraudTemplate);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       {/* AppBar */}

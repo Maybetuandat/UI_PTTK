@@ -1,5 +1,11 @@
 export interface FraudTemplateStatistic {
-  id: number;
-  templateCount: number;
-  fraudLabelName: string;
+  totalTemplatesCount: number;
+  labeledTemplatesCount: number;
+  unlabeledTemplatesCount: number;
+  templateCounts: LabelCount[];
+}
+interface LabelCount {
+  labelName: string;
+  count: number;
+  color: string;
 }

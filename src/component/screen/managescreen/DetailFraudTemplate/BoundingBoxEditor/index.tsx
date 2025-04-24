@@ -150,10 +150,7 @@ export default function BoundingBoxEditor({
     }
   };
 
-  const handleBoxesRender = () => {
-    // Optional callback for when boxes are rendered
-    // Can be used for performance optimizations or tracking
-  };
+  const handleBoxesRender = () => {};
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>

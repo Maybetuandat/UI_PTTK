@@ -15,6 +15,8 @@ import Header from "./Header";
 import TemplateGrid from "./TemplateGrid";
 import BoundingBox from "../../../types/model/BoundingBox";
 import { FraudLabel } from "../../../types/model/FraudLabel";
+import { FraudTemplateStatistic } from "../../../types/model/FraudTemplateStatistic";
+import DialogStatistic from "./DialogStatistic";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,6 +27,9 @@ export default function ManageScreen() {
   const [error, setError] = useState<string | null>(null);
   const [openBulkDelete, setOpenBulkDelete] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [fraudTemplateStatistic, setFraudTemplateStatistic] =
+    useState<FraudTemplateStatistic>();
 
   const [templateBoxesMap, setTemplateBoxesMap] = useState<
     Record<number, BoundingBox[]>
@@ -32,12 +37,30 @@ export default function ManageScreen() {
   const [labels, setLabels] = useState<FraudLabel[]>([]);
   const [loadingBoxes, setLoadingBoxes] = useState(false);
 
+  const fetchFraudTemplateStatistic = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/fraud-template-statistic`);
+      setFraudTemplateStatistic(response.data);
+      // console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching fraud template statistic:", error);
+    }
+  };
+  const handleCloseDialogStatistic = () => {
+    setOpenDialog(false);
+  };
+
+  useEffect(() => {
+    fetchFraudTemplateStatistic();
+  }, []);
+  //console.log(fraudTemplateStatistic);
   // Fetch templates
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         const response = await axios.get(`${API_URL}/fraud-template`);
         setTemplates(response.data);
+        //   console.log(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
         setError("Không thể tải dữ liệu. Vui lòng thử lại.");
@@ -118,9 +141,8 @@ export default function ManageScreen() {
       alert("Xóa nhiều thất bại!");
     }
   };
-
   return (
-    <Box sx={{ width: "100%", height: "100vh" }}>
+    <Box sx={{ width: "100%", height: "100%", overflow: "auto" }}>
       <Box
         sx={{
           display: "flex",
@@ -129,7 +151,7 @@ export default function ManageScreen() {
           p: 2,
           borderRadius: 2,
           boxShadow: 3,
-          height: "100%",
+          minHeight: "100%",
         }}
       >
         <Header
@@ -138,6 +160,7 @@ export default function ManageScreen() {
           setSelectedIds={setSelectedIds}
           openBulkDelete={() => setOpenBulkDelete(true)}
           templates={templates}
+          setOpenDialog={setOpenDialog}
         />
 
         {loading ? (
@@ -177,6 +200,12 @@ export default function ManageScreen() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <DialogStatistic
+        openDialog={openDialog}
+        onClose={handleCloseDialogStatistic}
+        fraudTemplateStatistic={fraudTemplateStatistic}
+      />
     </Box>
   );
 }
