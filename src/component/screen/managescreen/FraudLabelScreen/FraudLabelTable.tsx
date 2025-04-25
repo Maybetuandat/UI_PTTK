@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { FraudLabel } from "../../../../types/model/FraudLabel";
-
+import { useToast } from "./ToastContext";
 interface FraudLabelTableProps {
   fraudLabels: FraudLabel[];
   fetchFraudLabels: () => void;
@@ -36,6 +36,7 @@ export default function FraudLabelTable({
   fraudLabels,
   fetchFraudLabels,
 }: FraudLabelTableProps) {
+  const { showToast } = useToast();
   const colorOptions = [
     { name: "Deep Purple", colorCode: "#6200EA" },
     { name: "Amber", colorCode: "#FFC107" },
@@ -64,6 +65,7 @@ export default function FraudLabelTable({
   const [selectedFraud, setSelectedFraud] = useState<FraudLabel | null>(null);
   const [newLabelColor, setNewLabelColor] = useState<string>("#6200EA");
   const [loading, setLoading] = useState<boolean>(false);
+  const [idUndo, setIdUndo] = useState<string>("");
 
   const handleEditOpen = (fraud: FraudLabel) => {
     setSelectedFraud(fraud);
@@ -103,7 +105,25 @@ export default function FraudLabelTable({
   const handleDeleteConfirm = async () => {
     if (selectedFraud) {
       try {
-        await axios.delete(`${API_URL}/fraud-label/${selectedFraud.id}`);
+        const response = await axios.delete(
+          `${API_URL}/fraud-label/${selectedFraud.id}`
+        );
+
+        const { message, commandId, undoTimeoutMs } = response.data;
+
+        showToast(
+          message || "Nhãn đã được xóa",
+          undoTimeoutMs || 30000,
+          async () => {
+            const response = await axios.post(
+              `${API_URL}/fraud-label/undo/${commandId}`
+            );
+            if (response.status === 200) {
+              fetchFraudLabels();
+            }
+          }
+        );
+
         fetchFraudLabels();
         handleDeleteClose();
       } catch (error) {
