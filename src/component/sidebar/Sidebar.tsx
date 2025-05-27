@@ -1,11 +1,11 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { IconButton, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import ModelTrainingIcon from "@mui/icons-material/ModelTraining";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import TopicIcon from "@mui/icons-material/Topic";
 import { mycolor } from "../../theme/color";
 import StackedBarChartIcon from "@mui/icons-material/StackedBarChart";
-
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 export default function Sidebar() {
   return (
     <Stack
@@ -43,6 +43,12 @@ export default function Sidebar() {
           <TopicIcon />
         </IconButton>
         <Typography variant="caption">Manage</Typography>
+      </Stack>
+      <Stack alignItems="center" spacing={1}>
+        <IconButton component={Link} to="/model">
+          <PrecisionManufacturingIcon />
+        </IconButton>
+        <Typography variant="caption">Model</Typography>
       </Stack>
     </Stack>
   );
