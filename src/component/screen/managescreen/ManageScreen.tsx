@@ -13,61 +13,43 @@ import {
 import { FraudTemplate } from "../../../types/model/FraudTemplate";
 import Header from "./Header";
 import TemplateGrid from "./TemplateGrid";
-import BoundingBox from "../../../types/model/BoundingBox";
+
 import { FraudLabel } from "../../../types/model/FraudLabel";
-import { FraudTemplateStatistic } from "../../../types/model/FraudTemplateStatistic";
+
 import DialogStatistic from "./DialogStatistic";
+import { useToast } from "./FraudLabelScreen/ToastContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function ManageScreen() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState<FraudTemplate[]>([]);
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openBulkDelete, setOpenBulkDelete] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [fraudTemplateStatistic, setFraudTemplateStatistic] =
-    useState<FraudTemplateStatistic>();
 
-  const [templateBoxesMap, setTemplateBoxesMap] = useState<
-    Record<number, BoundingBox[]>
-  >({});
   const [labels, setLabels] = useState<FraudLabel[]>([]);
   const [loadingBoxes, setLoadingBoxes] = useState(false);
 
-  const fetchFraudTemplateStatistic = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/fraud-template-statistic`);
-      setFraudTemplateStatistic(response.data);
-      // console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching fraud template statistic:", error);
-    }
-  };
   const handleCloseDialogStatistic = () => {
     setOpenDialog(false);
   };
-
+  const fetchTemplates = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/fraud-template`);
+      setTemplates(response.data);
+      //   console.log(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu:", error);
+      setError("Không thể tải dữ liệu. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    fetchFraudTemplateStatistic();
-  }, []);
-  //console.log(fraudTemplateStatistic);
-  // Fetch templates
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/fraud-template`);
-        setTemplates(response.data);
-        //   console.log(response.data);
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-        setError("Không thể tải dữ liệu. Vui lòng thử lại.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTemplates();
   }, []);
 
@@ -84,55 +66,28 @@ export default function ManageScreen() {
 
     fetchLabels();
   }, []);
-
-  // Fetch bounding boxes for all templates
-  useEffect(() => {
-    const fetchAllBoundingBoxes = async () => {
-      if (templates.length === 0) return;
-
-      setLoadingBoxes(true);
-      const boxesMap: Record<number, BoundingBox[]> = {};
-
-      try {
-        // Fetch boxes for each template
-        const promises = templates.map(async (template) => {
-          try {
-            const response = await axios.get(`${API_URL}/bounding-box`, {
-              params: {
-                fraudTemplateId: template.id,
-              },
-            });
-            boxesMap[template.id] = response.data;
-          } catch (err) {
-            console.error(
-              `Error fetching boxes for template ${template.id}:`,
-              err
-            );
-            boxesMap[template.id] = [];
-          }
-        });
-
-        await Promise.all(promises);
-        setTemplateBoxesMap(boxesMap);
-      } catch (error) {
-        console.error("Error fetching bounding boxes:", error);
-      } finally {
-        setLoadingBoxes(false);
-      }
-    };
-
-    fetchAllBoundingBoxes();
-  }, [templates]);
-
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await axios.delete(`${API_URL}/fraud-template`, {
+      const reponseDelete = await axios.delete(`${API_URL}/fraud-template`, {
         data: selectedIds,
         headers: { "Content-Type": "application/json" },
       });
-      const response = await axios.get(`${API_URL}/fraud-template`);
-      setTemplates(response.data);
+
+      showToast(
+        reponseDelete.data.message || "Bounding box is deleted",
+        reponseDelete.data.undoTimeoutMs || 30000,
+        async () => {
+          const responseDeleteTemplate = await axios.post(
+            `${API_URL}/fraud-template/undo/${reponseDelete.data.commandId}`
+          );
+          if (responseDeleteTemplate.status === 200) {
+            fetchTemplates();
+          }
+        }
+      );
+
+      fetchTemplates();
       setSelectedIds([]);
       setOpenBulkDelete(false);
       alert("Xóa nhiều mục thành công!");
@@ -178,7 +133,6 @@ export default function ManageScreen() {
             templates={templates}
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
-            templateBoxesMap={templateBoxesMap}
             labels={labels}
             loadingBoxes={loadingBoxes}
           />
@@ -204,7 +158,6 @@ export default function ManageScreen() {
       <DialogStatistic
         openDialog={openDialog}
         onClose={handleCloseDialogStatistic}
-        fraudTemplateStatistic={fraudTemplateStatistic}
       />
     </Box>
   );

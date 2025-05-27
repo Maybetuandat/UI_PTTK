@@ -7,7 +7,7 @@ interface TemplateGridProps {
   templates: FraudTemplate[];
   selectedIds: number[];
   setSelectedIds: React.Dispatch<React.SetStateAction<number[]>>;
-  templateBoxesMap: Record<number, BoundingBox[]>;
+
   labels: FraudLabel[];
   loadingBoxes: boolean;
 }
@@ -16,7 +16,7 @@ export default function TemplateGrid({
   templates,
   selectedIds,
   setSelectedIds,
-  templateBoxesMap,
+
   labels,
   loadingBoxes,
 }: TemplateGridProps) {
@@ -46,7 +46,7 @@ export default function TemplateGrid({
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
             templates={templates}
-            boundingBoxes={templateBoxesMap[template.id] || []}
+            boundingBoxes={template.boundingBoxes}
             labels={labels}
             loadingBoxes={loadingBoxes}
           />

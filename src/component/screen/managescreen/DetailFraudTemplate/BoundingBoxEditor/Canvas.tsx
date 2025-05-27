@@ -270,6 +270,7 @@ const Canvas: React.FC<CanvasProps> = ({
         heightPixel,
         fraudTemplate: fraudTemplate,
         fraudLabel: selectedLabel,
+        id: 0,
       };
 
       onBoxAdd(newBox);

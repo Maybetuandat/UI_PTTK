@@ -2,7 +2,7 @@ import { FraudLabel } from "./FraudLabel";
 import { FraudTemplate } from "./FraudTemplate";
 
 export default interface BoundingBox {
-  id?: number;
+  id: number;
   xCenter: number;
   yCenter: number;
   width: number;

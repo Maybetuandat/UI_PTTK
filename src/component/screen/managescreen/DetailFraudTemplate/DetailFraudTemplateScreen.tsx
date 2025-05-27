@@ -12,13 +12,17 @@ import { useLocation, useParams } from "react-router-dom";
 import { FraudTemplate } from "../../../../types/model/FraudTemplate";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import BoundingBox from "../../../../types/model/BoundingBox";
 import { FraudLabel } from "../../../../types/model/FraudLabel";
 import BoundingBoxEditor from "./BoundingBoxEditor";
+import { ShowChart } from "@mui/icons-material";
+import { useToast } from "../FraudLabelScreen/ToastContext";
 
 export default function DetailFraudTemplateScreen() {
   const location = useLocation();
+  const { showToast } = useToast();
   const { index, size } = location.state || {};
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,13 +31,9 @@ export default function DetailFraudTemplateScreen() {
 
   const [fraudTemplate, setFraudTemplate] = useState<FraudTemplate>();
   const { fraudLabelId } = location.state || {};
-
-  // Separate states for database boxes and new boxes
-  const [dbBoxes, setDbBoxes] = useState<BoundingBox[]>([]); // Boxes from database (read-only)
-  const [newBoxes, setNewBoxes] = useState<BoundingBox[]>([]); // New boxes (editable)
+  const [dbBoxes, setDbBoxes] = useState<BoundingBox[]>([]);
+  const [newBoxes, setNewBoxes] = useState<BoundingBox[]>([]);
   const [labels, setLabels] = useState<FraudLabel[]>([]);
-
-  // Message state for notifications
   const [message, setMessage] = useState<{
     open: boolean;
     text: string;
@@ -44,7 +44,6 @@ export default function DetailFraudTemplateScreen() {
     severity: "info",
   });
 
-  // Fetch fraud template data
   const fetchFraudTemplate = async () => {
     if (!fraudTemplateId) {
       setError("Không tìm thấy đối tượng mẫu yêu cầu");
@@ -57,14 +56,55 @@ export default function DetailFraudTemplateScreen() {
         `${API_URL}/fraud-template/${fraudTemplateId}`
       );
       setFraudTemplate(response.data);
+      setDbBoxes(response.data.boundingBoxes || []);
+      console.log("Fraud template data:", response.data);
     } catch (error) {
       setError("Lỗi khi tải dữ liệu!");
     } finally {
       setLoading(false);
     }
   };
+  const handleDeleteBox = async (boxId: number) => {
+    if (!boxId || !fraudTemplateId) return;
 
-  // Fetch labels data
+    try {
+      setLoading(true);
+
+      // Gọi API để xóa box thông qua endpoint của template
+      const response = await axios.delete(
+        `${API_URL}/fraud-template/${fraudTemplateId}/bounding-box/${boxId}`
+      );
+
+      // Cập nhật UI
+      setDbBoxes(dbBoxes.filter((box) => box.id !== boxId));
+
+      showToast(
+        response.data.message || "Bounding box is deleted",
+        response.data.undoTimeoutMs || 30000,
+        async () => {
+          const responseDeleteBoundingBox = await axios.post(
+            `${API_URL}/fraud-template/undo/${response.data.commandId}`
+          );
+          if (responseDeleteBoundingBox.status === 200) {
+            fetchFraudTemplate();
+          }
+        }
+      );
+
+      // Refresh data
+      fetchFraudTemplate();
+    } catch (error) {
+      console.error("Error deleting bounding box:", error);
+      setMessage({
+        open: true,
+        text: "Lỗi khi xóa bounding box",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchLabels = async () => {
     try {
       const response = await axios.get(`${API_URL}/fraud-label`);
@@ -79,75 +119,48 @@ export default function DetailFraudTemplateScreen() {
     }
   };
 
-  // Fetch bounding boxes data from database
-  const fetchBoundingBoxes = async () => {
-    if (!fraudTemplateId) return;
-
-    try {
-      const response = await axios.get(`${API_URL}/bounding-box`, {
-        params: {
-          fraudTemplateId: fraudTemplateId,
-        },
-      });
-
-      console.log("Database boxes:", response.data);
-      setDbBoxes(response.data);
-    } catch (error) {
-      console.error("Error fetching bounding boxes:", error);
-      setMessage({
-        open: true,
-        text: "Failed to load bounding boxes",
-        severity: "error",
-      });
-    }
-  };
-
-  // Load all data on component mount
   useEffect(() => {
     fetchFraudTemplate();
     fetchLabels();
   }, [fraudTemplateId]);
 
-  useEffect(() => {
-    if (fraudTemplate?.id) {
-      fetchBoundingBoxes();
-    }
-  }, [fraudTemplate]);
-
-  // Handle changes to new boxes only
   const handleNewBoxesChange = (updatedBoxes: BoundingBox[]) => {
     setNewBoxes(updatedBoxes);
   };
 
-  // Save new boxes to database
   const handleSaveNewBoxes = async (boxesToSave: BoundingBox[]) => {
     if (!fraudTemplateId || boxesToSave.length === 0) return;
 
     try {
       setLoading(true);
 
+      setLoading(true);
+
       for (const box of boxesToSave) {
-        const formData = new FormData();
-
-        // Append properties of bounding box
-        formData.append("xPixel", String(box.xPixel));
-        formData.append("yPixel", String(box.yPixel));
-        formData.append("widthPixel", String(box.widthPixel));
-        formData.append("heightPixel", String(box.heightPixel));
-
-        // Append extra params
-        formData.append("fraudTemplateId", String(fraudTemplateId));
-        formData.append("fraudLabelId", String(box.fraudLabel.id));
-
-        await axios.post(`${API_URL}/bounding-box`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
+        // Tạo object JSON phù hợp với cấu trúc BoundingBox
+        const boundingBoxData = {
+          xPixel: box.xPixel,
+          yPixel: box.yPixel,
+          widthPixel: box.widthPixel,
+          heightPixel: box.heightPixel,
+          // Gửi ID label thông qua thuộc tính fraudLabel
+          fraudLabel: {
+            id: box.fraudLabel.id,
           },
-        });
+        };
+
+        await axios.post(
+          `${API_URL}/fraud-template/${fraudTemplateId}/bounding-box`,
+          boundingBoxData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       }
 
-      // After successful save, refresh the database boxes and clear new boxes
-      await fetchBoundingBoxes();
+      fetchFraudTemplate();
       setNewBoxes([]);
 
       return true;
@@ -159,14 +172,11 @@ export default function DetailFraudTemplateScreen() {
     }
   };
 
-  // Handler for deleting all new boxes (doesn't affect database boxes)
   const handleDeleteAllNewBoxes = async () => {
-    // Simply clear the new boxes array
     setNewBoxes([]);
     return Promise.resolve(true);
   };
 
-  // Handler for creating a new label
   const handleCreateLabel = async (
     name: string,
     color: string,
@@ -328,6 +338,19 @@ export default function DetailFraudTemplateScreen() {
                             <strong>Size:</strong> {Math.round(box.widthPixel)}{" "}
                             × {Math.round(box.heightPixel)}
                           </Typography>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <DeleteIcon
+                              sx={{
+                                color: "error.main",
+                                cursor: "pointer",
+                                "&:hover": {
+                                  color: "error.dark",
+                                },
+                                fontSize: "1.2rem",
+                              }}
+                              onClick={() => handleDeleteBox(box.id)}
+                            />
+                          </Box>
                         </Box>
                       </Paper>
                     );

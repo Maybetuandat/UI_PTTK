@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,18 +10,32 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FraudTemplateStatistic } from "../../../types/model/FraudTemplateStatistic";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface fraudTemplateStatisticSummaryProps {
   openDialog: boolean;
   onClose: () => void;
-  fraudTemplateStatistic: FraudTemplateStatistic | undefined;
 }
 
 const DialogStatistic: React.FC<fraudTemplateStatisticSummaryProps> = ({
   openDialog,
   onClose,
-  fraudTemplateStatistic,
 }) => {
+  const [fraudTemplateStatistic, setFraudTemplateStatistic] =
+    useState<FraudTemplateStatistic>();
+
+  const fetchTemplatesStatisTic = async () => {
+    const response = await axios.get(`${API_URL}/fraud-template-statistic`);
+    setFraudTemplateStatistic(response.data);
+  };
+
+  useEffect(() => {
+    if (openDialog) {
+      fetchTemplatesStatisTic();
+    }
+  }, [openDialog]);
   if (!fraudTemplateStatistic) return null;
   const labeledPercentage = Math.round(
     (fraudTemplateStatistic!!.labeledTemplatesCount /

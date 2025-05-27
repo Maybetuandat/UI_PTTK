@@ -1,0 +1,37 @@
+Box : Boc layout the same with div in html
+Container : Canh giua noi dung, tu dong padding hai ben 
+Grid : Chia cột (responsive grid system)
+Stack : Xếp các item theo chiều ngang/dọc nhanh gọn
+Paper : Một cái div có nền trắng + shadow nhẹ
+
+
+
+Typography: 	Hiển thị văn bản, tiêu đề (h1-h6, body, caption)
+Link: Link như thẻ <a>, có thể thêm style theo MUI
+
+
+
+Input handle 
+
+TextField: Ô input (text, password, email...)
+Select : Dropdown chọn option
+Checkbox:
+Radio / RadioGroup
+Switch
+Button
+Slider
+
+
+FeedBack 
+
+Snackbar: Popup thông báo nhỏ dưới góc màn hình
+Alert : Hiển thị thông báo màu sắc (thành công, lỗi, warning...)
+
+Dialog: Modal (hộp thoại bật lên)
+Backdrop: Một lớp mờ nền khi dialog mở
+
+Navigation 
+
+AppBar:Thanh header cố định trên cùng
+Toolbar: Bên trong AppBar, chứa nút/menu
+

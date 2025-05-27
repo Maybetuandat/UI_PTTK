@@ -1,3 +1,5 @@
+import BoundingBox from "./BoundingBox";
+
 export interface FraudTemplate {
   id: number;
   imageUrl: string;
@@ -5,4 +7,5 @@ export interface FraudTemplate {
   createAt: string;
   width: number;
   height: number;
+  boundingBoxes: BoundingBox[];
 }

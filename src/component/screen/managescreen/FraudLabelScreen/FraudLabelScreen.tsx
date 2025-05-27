@@ -18,7 +18,12 @@ export default function FraudLabelScreen() {
   const fetchFraudLabels = async () => {
     try {
       const response = await axios.get(`${API_URL}/fraud-label`);
-      setFraudLabels(response.data);
+
+      const listFraudLabel: FraudLabel[] = response.data;
+
+      setFraudLabels(
+        listFraudLabel.sort((a, b) => a.name.localeCompare(b.name))
+      );
     } catch (err) {
       setError("Lỗi khi tải dữ liệu!");
     } finally {
@@ -54,7 +59,7 @@ export default function FraudLabelScreen() {
   return (
     <Box p={3}>
       <Typography variant="h4" mb={2}>
-        📂 Manage FraudLabel
+        Manage FraudLabel
       </Typography>
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button

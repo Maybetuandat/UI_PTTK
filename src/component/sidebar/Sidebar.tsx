@@ -32,10 +32,10 @@ export default function Sidebar() {
       </Stack>
 
       <Stack alignItems="center" spacing={1}>
-        <IconButton component={Link} to="/launch">
+        <IconButton component={Link} to="/detect">
           <StackedBarChartIcon />
         </IconButton>
-        <Typography variant="caption">Statistics</Typography>
+        <Typography variant="caption">Detect</Typography>
       </Stack>
 
       <Stack alignItems="center" spacing={1}>
