@@ -30,54 +30,16 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
-
-// Mock data for models
-const mockModels = [
-  {
-    id: 1,
-    name: "Fraud Detection v1.0",
-    description: "General purpose fraud detection model",
-    accuracy: "94.3%",
-    type: "Classification",
-    lastUpdated: "2025-05-12",
-    imageUrl: "https://picsum.photos/seed/model1/300/200",
-  },
-  {
-    id: 2,
-    name: "Document Forgery Detection",
-    description: "Specialized in detecting forged documents and signatures",
-    accuracy: "96.8%",
-    type: "Classification",
-    lastUpdated: "2025-05-20",
-    imageUrl: "https://picsum.photos/seed/model2/300/200",
-  },
-  {
-    id: 3,
-    name: "Bank Card Detection",
-    description: "Optimized for credit card and bank card fraud",
-    accuracy: "98.2%",
-    type: "Classification",
-    lastUpdated: "2025-05-15",
-    imageUrl: "https://picsum.photos/seed/model3/300/200",
-  },
-  {
-    id: 4,
-    name: "ID Document Verification",
-    description: "For verifying ID cards, passports and official documents",
-    accuracy: "95.7%",
-    type: "Classification",
-    lastUpdated: "2025-04-28",
-    imageUrl: "https://picsum.photos/seed/model4/300/200",
-  },
-];
+import { Model } from "../../../types/model/Model";
+import axios from "axios";
+const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL;
 
 const DetectScreen = () => {
   // State management
   const [activeStep, setActiveStep] = useState(0);
   const [selectedModelId, setSelectedModelId] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<
-    (typeof mockModels)[0] | null
-  >(null);
+  const [listModel, setListModel] = useState<Model[]>([]);
+  const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -118,13 +80,25 @@ const DetectScreen = () => {
     },
   ];
 
-  // Handle model selection
+  const fetchModels = async () => {
+    const response = await axios.get(`${PYTHON_API_URL}/models`);
+    console.log("Models fetched:", response.data);
+    setListModel(response.data);
+  };
+  useEffect(() => {
+    fetchModels().catch((error) => {
+      console.error("Error fetching models:", error);
+      setSnackbarMessage("Failed to load models. Please try again later.");
+      setSnackbarOpen(true);
+    });
+  }, []);
+
   const handleModelChange = (event: any) => {
     const modelId = event.target.value;
     setSelectedModelId(modelId);
 
     if (modelId) {
-      const model = mockModels.find((m) => m.id.toString() === modelId);
+      const model = listModel.find((m) => m.id.toString() === modelId);
       if (model) {
         setSelectedModel(model);
       }
@@ -246,7 +220,7 @@ const DetectScreen = () => {
                   <MenuItem value="">
                     <em>Select a model</em>
                   </MenuItem>
-                  {mockModels.map((model) => (
+                  {listModel.map((model) => (
                     <MenuItem key={model.id} value={model.id.toString()}>
                       {model.name} ({model.accuracy})
                     </MenuItem>
@@ -260,13 +234,6 @@ const DetectScreen = () => {
                     Model Details
                   </Typography>
                   <Grid container spacing={2}>
-                    <Grid item xs={12} md={4}>
-                      <img
-                        src={selectedModel?.imageUrl}
-                        alt={selectedModel?.name}
-                        style={{ width: "100%", borderRadius: "8px" }}
-                      />
-                    </Grid>
                     <Grid item xs={12} md={8}>
                       <Typography variant="h6" gutterBottom>
                         {selectedModel?.name}
@@ -281,8 +248,7 @@ const DetectScreen = () => {
                         {selectedModel?.description}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Type: {selectedModel?.type} • Last updated:{" "}
-                        {selectedModel?.lastUpdated}
+                        Last updated: {selectedModel?.lastUpdate}
                       </Typography>
                     </Grid>
                   </Grid>
