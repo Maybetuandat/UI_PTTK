@@ -7,6 +7,7 @@ import FraudTemplateAddScreen from "../screen/managescreen/AddFraudTemplate/Frau
 import DetailFraudTemplateScreen from "../screen/managescreen/DetailFraudTemplate/DetailFraudTemplateScreen";
 import FraudLabelScreen from "../screen/managescreen/FraudLabelScreen/FraudLabelScreen";
 import DetectScreen from "../screen/detect/DetectScreen";
+import ResultsView from "../screen/detect/ResultsView";
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
         path="/manage/fraud-template/:fraudTemplateId"
         element={<DetailFraudTemplateScreen />}
       />
+      <Route path="/detect/results" element={<ResultsView />} />
       <Route path="/detect" element={<DetectScreen />} />
       <Route path="/manage/fraud-label" element={<FraudLabelScreen />} />
       <Route path="*" element={<Navigate to="/tools" />} />
