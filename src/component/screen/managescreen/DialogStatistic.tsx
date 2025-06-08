@@ -179,55 +179,6 @@ const DialogStatistic: React.FC<fraudTemplateStatisticSummaryProps> = ({
               </Box>
             </Box>
           </Paper>
-
-          {/* Labels Bar Chart */}
-          <Paper
-            elevation={2}
-            sx={{
-              p: 3,
-              flex: 1,
-              minWidth: 0,
-              height: { xs: "auto", md: "100%" },
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Labels
-            </Typography>
-            <Box sx={{ mt: 4 }}>
-              {sortedLabels.map((label, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mb: 0.5,
-                    }}
-                  >
-                    <Typography variant="body2">{label.labelName}</Typography>
-                    <Typography variant="body2">{label.count}</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      height: 24,
-                      borderRadius: 1,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: `${(label.count / maxCount) * 100}%`,
-                        height: "100%",
-                        bgcolor: label.color,
-                        borderRadius: 1,
-                        transition: "width 0.3s ease",
-                      }}
-                    />
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Paper>
         </Box>
       </DialogContent>
     </Dialog>
